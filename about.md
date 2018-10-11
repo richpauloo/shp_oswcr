@@ -2,11 +2,11 @@
 
 * Enter a shapefile, and this R Shiny web application will return all wells in the <a href="https://water.ca.gov/Programs/Groundwater-Management/Wells" target="_blank">California Online State Well Completion Report Database (OSWCR)</a> that fall within that shapefile.  
 * To accomplish this task, this application interfaces with a cleaned version of OSWCR, which contains nearly **900,000** cleaned wells. The steps used in the cleaning of this database are detailed [here](https://richpauloo.github.io/oswcr_1.html).
-* The code for this project can be found in <ahref ="https://github.com/richpauloo/shp_oswcr" target="blank">this Github repository</a>.
+* The code for this project can be found in <a href ="https://github.com/richpauloo/shp_oswcr" target="blank">this Github repository</a>.
 
 ***
 
-# How to Use this Application
+## How to Use this Application
 
 See this <a href = "https://youtu.be/DyF8WXNVZ-A">online instructional video</a> that accompanies the written instructions below.  
 
