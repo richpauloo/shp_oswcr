@@ -101,3 +101,7 @@ well_logs_sp <- read_rds("well_logs_sp.rds") # for shiny app
 # css <- read_rds(paste(fp$app, "data","css.rds",sep="/")) # for local testing
 css <- read_rds("css.rds") # for shiny app
 
+# get esri basemaps and add to leaflet
+esri <- grep("^Esri", providers, value = TRUE)
+esri <- c("OpenStreetMap","Esri.WorldImagery","Esri.WorldTerrain", "CartoDB.DarkMatter")
+

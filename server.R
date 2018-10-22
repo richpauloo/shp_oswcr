@@ -91,8 +91,29 @@ shinyServer(function(input, output) {
                    clusterOptions = markerClusterOptions(),
                    popup = popupTable(shp()[[3]]@data, zcol = c("WCRNumber","WCR_PDF","lat","lon","top","bot","type") ))
       m$dependencies <- list(m$dependencies[[1]],css) # add pretty popupTable CSS from mapview
+  
+      # add basemaps
+      for (provider in esri) {
+        m <- m %>% addProviderTiles(provider, group = provider)
+      }
       
-      m
+      # plot leaflet
+      m %>%
+        addLayersControl(baseGroups = esri, #names(esri),
+                         options = layersControlOptions(collapsed = FALSE)) %>%
+        addMiniMap(tiles = esri[[1]], toggleDisplay = TRUE,
+                   position = "bottomleft") %>%
+        htmlwidgets::onRender("
+                              function(el, x) {
+                              var myMap = this;
+                              myMap.on('baselayerchange',
+                              function (e) {
+                              myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
+                              })
+                              }") %>% 
+        addEasyButton(easyButton(
+          icon="fa-globe", title="Zoom Out",
+          onClick=JS("function(btn, map){ map.setZoom(9); }")))
     }
   })
 
