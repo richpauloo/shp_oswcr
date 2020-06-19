@@ -1,0 +1,87 @@
+---
+title: "Napa WCR data"
+output: html_document
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(raster)
+library(sp)
+library(leaflet)
+#devtools::install_github("r-spatial/leafgl")
+library(leafgl)
+library(sf)
+
+# well logs
+well_logs_sp <- read_rds("well_logs_sp.rds") 
+
+# get esri basemaps and add to leaflet
+esri <- c("OpenStreetMap","Esri.WorldImagery","Esri.WorldTerrain", "CartoDB.DarkMatter")
+
+# shapefile of interest
+s <- shapefile("amber_napa/cnty_bndry_simplified_250ft_WGS84.shp") %>% 
+  spTransform(crs(well_logs_sp))
+
+# WCR to URL key
+url_key <- read_csv("wellreportpdflinks.csv")
+
+# subset point to polygon
+wells_in_s <- well_logs_sp[s, ] %>% 
+  st_as_sf(coords = c("lat","lon")) %>% 
+  mutate(WCRLink = NULL) %>% 
+  left_join(url_key, by = "WCRNumber") %>% 
+  mutate(link = ifelse(
+    is.na(WCRLink), 
+    "NO PDF Available", 
+    paste0("<a href = '", WCRLink, "' target = '_blank'> WCR Report</a>")
+    )
+  )
+
+#st_write(wells_in_s, "napa_wells.shp")
+```
+
+```{r, echo = FALSE, out.width="100%"}
+#options(viewer = NULL) # view in browser
+
+m <- leaflet(wells_in_s) %>% 
+  addTiles() %>% 
+  addPolygons(data = st_as_sf(s)) %>% 
+  addMarkers(clusterOptions = markerClusterOptions(),
+             popup = paste0(wells_in_s$WCRNumber, "<br>",
+                            wells_in_s$type, "<br>",
+                            wells_in_s$TotalCompletedDepth, " ft. deep", "<br>",
+                            "Drilled in ", wells_in_s$year, "<br>",
+                            wells_in_s$link))
+  
+for(provider in esri) {
+  m <- m %>% addProviderTiles(provider, group = provider)
+  }
+
+m %>% 
+  addLayersControl(baseGroups = esri, 
+                   options = layersControlOptions(collapsed = FALSE)) %>% 
+  addMiniMap(tiles = esri[[1]], toggleDisplay = TRUE,
+             position = "bottomleft") %>%
+  htmlwidgets::onRender("function(el, x) {
+                         var myMap = this;
+                         myMap.on('baselayerchange',
+                         function (e) {
+                         myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
+                         })
+                         }") %>% 
+  addEasyButton(
+    easyButton(
+      icon="fa-globe", 
+      title="Zoom Out",
+      onClick=JS("function(btn, map){ map.setZoom(9); }")
+      )
+    )
+```
+
+
+[DOWNLOAD SHAPEFILE](https://github.com/richpauloo/rp/raw/master/content/wcr/napa/napa_wells.zip)
+
+
+## Preferred Citation 
+
+> Pauloo, Rich (2018, April 30). *An Exploratory Data Analysis of California's Well Completion Reports.* Retrieved from http://richpauloo.com/oswcr-eda
