@@ -1,9 +1,9 @@
 ---
-title: "Napa WCR data"
+title: "Ukiah WCR data"
 output: html_document
 ---
 
-```{r, include=FALSE}
+```{r, include=FALSE, warning=FALSE, error=FALSE}
 library(tidyverse)
 library(raster)
 library(sp)
@@ -13,13 +13,13 @@ library(leafgl)
 library(sf)
 
 # well logs
-well_logs_sp <- read_rds("well_logs_sp.rds") 
+well_logs_sp <- readr::read_rds("well_logs_sp.rds") 
 
 # get esri basemaps and add to leaflet
 esri <- c("OpenStreetMap","Esri.WorldImagery","Esri.WorldTerrain", "CartoDB.DarkMatter")
 
 # shapefile of interest
-s <- shapefile("amber_napa/cnty_bndry_simplified_250ft_WGS84.shp") %>% 
+s <- shapefile("samira_ukiah/GSA_limit.shp") %>% 
   spTransform(crs(well_logs_sp))
 
 # WCR to URL key
@@ -37,10 +37,10 @@ wells_in_s <- well_logs_sp[s, ] %>%
     )
   )
 
-#st_write(wells_in_s, "napa_wells.shp")
+#st_write(wells_in_s, "ukiah_wells.shp")
 ```
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE,  warning=FALSE, error=FALSE, out.width="100%"}
 #options(viewer = NULL) # view in browser
 
 m <- leaflet(wells_in_s) %>% 
@@ -79,7 +79,7 @@ m %>%
 ```
 
 
-[DOWNLOAD SHAPEFILE](https://github.com/richpauloo/rp/raw/master/content/wcr/napa/napa_wells.zip)
+[DOWNLOAD SHAPEFILE](https://github.com/richpauloo/richpauloo.github.io/raw/master/wcr/ukiah/ukiah_wells.zip)
 
 
 ## Preferred Citation 
